@@ -1,4 +1,7 @@
-add_library (palindrome palindrome.c)
+add_library (palindrome SHARED palindrome.c)
+add_library (palindromeStatic palindrome.c)
 target_include_directories (palindrome PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-install(TARGETS palindrome
-        ARCHIVE DESTINATION lib)
+target_include_directories (palindromeStatic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+install(TARGETS palindrome LIBRARY DESTINATION lib)
+install(TARGETS palindromeStatic ARCHIVE DESTINATION lib)
+install(FILES libpalindrome.h DESTINATION include)
