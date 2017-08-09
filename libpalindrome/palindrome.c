@@ -22,7 +22,7 @@ copy_reverse(char *buffer, const char *original)
   int i;
   for(i=strlen(original)-1; i >= 0; i--)
     *(buffer++) = original[i];
-  buffer = 0;
+  *buffer = 0;
 }
 
 int
@@ -31,14 +31,17 @@ is_palindrome(const char *something)
   char *copy1;
   char *copy2;
   int ret;
+  size_t len;
 
-  copy1 = malloc(strlen(something)+1);
-  copy2 = malloc(strlen(something)+1);
+  len = strlen(something);
+
+  copy1 = malloc(len+1);
+  copy2 = malloc(len+1);
 
   copy_letters(copy1, something);
   copy_reverse(copy2, copy1);
 
-  ret = strcmp(copy1,copy2) ? 0 : 1;
+  ret = strncmp(copy1, copy2, len) == 0;
 
   free(copy1);
   free(copy2);
