@@ -1,0 +1,63 @@
+name: linux
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+  PERL5LIB: /home/runner/perl5/lib/perl5
+  PERL_LOCAL_LIB_ROOT: /home/runner/perl5
+  PERL_MB_OPT: --install_base /home/runner/perl5
+  PERL_MM_OPT: INSTALL_BASE=/home/runner/perl5
+
+jobs:
+  c:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: cpanm
+        run: |
+          curl https://cpanmin.us | perl - App::cpanminus -n
+          echo "/home/runner/perl5/bin" >> $GITHUB_PATH
+
+      - name: Prepare for cache
+        run: |
+          perl -V > perlversion.txt
+          ls -l perlversion.txt
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v1
+        with:
+          path: ~/perl5
+          key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+
+      - name: Install Alien::cmake3 (from git)
+        run: ./maint/ci-install-cmake3
+
+      - name: Install other Perl deps
+        run: cpanm -n --installdeps .
+
+      - name: Configure
+        run: ./maint/cmake-exec cmake .
+
+      - name: Build
+        run: make
+
+      - name: Test
+        run: prove -v t
+
+      - name: CPAN log
+        if: ${{ failure() }}
+        run: |
+          cat ~/.cpanm/latest-build/build.log

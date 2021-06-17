@@ -6,3 +6,4 @@ cmake_install.cmake
 /palx/palx
 *.a
 *.dylib
+*.so

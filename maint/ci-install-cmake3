@@ -1,0 +1,15 @@
+#!/bin/bash -x
+
+set -euo pipefail
+IFS=$'\n\t'
+
+rm -rf /tmp/Alien-cmake3
+
+cpanm -n Dist::Zilla
+
+git clone --depth 2 https://github.com/PerlAlien/Alien-cmake3.git /tmp/Alien-cmake3
+cd /tmp/Alien-cmake3
+dzil authordeps --missing | cpanm -n
+dzil listdeps   --missing | cpanm -n
+dzil install --install-command 'cpanm -n -v .'
+

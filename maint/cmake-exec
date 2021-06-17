@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie qw( :all );
+use Alien::cmake3;
+use Env qw( @PATH @ACLOCAL_PATH );
+
+unshift @PATH, Alien::cmake3->bin_dir;
+
+if(@ARGV)
+{
+  system @ARGV;
+}
+else
+{
+  print STDERR "usage: $0 command [ ... ]\n";
+  exit 2;
+}
